@@ -10,13 +10,13 @@ import {
   useCreateAuctionListing,
   useCreateDirectListing,
 } from "@thirdweb-dev/react";
-import { NFT,NATIVE_TOKENS,NATIVE_TOKEN_ADDRESS } from "@thirdweb-dev/sdk";
+import { NFT, NATIVE_TOKENS, NATIVE_TOKEN_ADDRESS } from "@thirdweb-dev/sdk";
 import network from "../utils/network";
 import { useRouter } from "next/router";
 type Props = {};
 
 function Create({}: Props) {
-    const router = useRouter();
+  const router = useRouter();
   const networkMismatch = useNetworkMismatch();
   const [, switchNetwork] = useNetwork();
   const address = useAddress();
@@ -29,8 +29,16 @@ function Create({}: Props) {
     process.env.NEXT_PUBLIC_COLLECTION_CONTRACT,
     "nft-collection"
   );
-  const {mutate:createDirectListing,isLoading,error} = useCreateDirectListing(contract);
-  const {mutate:createAuctionListing,isLoading:isLoadingDirect,error:errorDirect} = useCreateAuctionListing(contract);
+  const {
+    mutate: createDirectListing,
+    isLoading,
+    error,
+  } = useCreateDirectListing(contract);
+  const {
+    mutate: createAuctionListing,
+    isLoading: isLoadingDirect,
+    error: errorDirect,
+  } = useCreateAuctionListing(contract);
 
   const handleCreateListing = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -44,50 +52,53 @@ function Create({}: Props) {
       elements: { listingType: { value: string }; price: { value: string } };
     };
     const { listingType, price } = target.elements;
-    if(listingType.value === "directListing"){
-        createDirectListing({
-            assetContractAddress:process.env.NEXT_PUBLIC_COLLECTION_CONTRACT!,
-            tokenId:selectNft.metadata.id,
-            currencyContractAddress:NATIVE_TOKEN_ADDRESS,
-            listingDurationInSeconds:60*60*24*7,
-            quantity:1,
-            buyoutPricePerToken:price.value,
-            startTimestamp:new Date()
-        },{
-            onSuccess(data,variables,context){
-                console.log("SUCCESS",data,variables,context)
-                router.push("/")
-            },
-            onError(error,variables,context){
-                console.log("ERROR",error,variables,context)
-                router.push("/")
-            }
-            
-        })
+    if (listingType.value === "directListing") {
+      createDirectListing(
+        {
+          assetContractAddress: process.env.NEXT_PUBLIC_COLLECTION_CONTRACT!,
+          tokenId: selectNft.metadata.id,
+          currencyContractAddress: NATIVE_TOKEN_ADDRESS,
+          listingDurationInSeconds: 60 * 60 * 24 * 7,
+          quantity: 1,
+          buyoutPricePerToken: price.value,
+          startTimestamp: new Date(),
+        },
+        {
+          onSuccess(data, variables, context) {
+            console.log("SUCCESS", data, variables, context);
+            router.push("/");
+          },
+          onError(error, variables, context) {
+            console.log("ERROR", error, variables, context);
+            router.push("/");
+          },
+        }
+      );
     }
 
-
-    if(listingType.value === "auctionListing"){
-        createAuctionListing({
-            assetContractAddress:process.env.NEXT_PUBLIC_COLLECTION_CONTRACT!,
-            tokenId:selectNft.metadata.id,
-            currencyContractAddress:NATIVE_TOKEN_ADDRESS,
-            listingDurationInSeconds:60*60*24*7,
-            quantity:1,
-            buyoutPricePerToken:price.value,
-            startTimestamp:new Date(),
-            reservePricePerToken:0,
-        },{
-            onSuccess(data,variables,context){
-                console.log("SUCCESS",data,variables,context)
-                router.push("/")
-            },
-            onError(error,variables,context){
-                console.log("ERROR",error,variables,context)
-                router.push("/")
-            }
-            
-        })
+    if (listingType.value === "auctionListing") {
+      createAuctionListing(
+        {
+          assetContractAddress: process.env.NEXT_PUBLIC_COLLECTION_CONTRACT!,
+          tokenId: selectNft.metadata.id,
+          currencyContractAddress: NATIVE_TOKEN_ADDRESS,
+          listingDurationInSeconds: 60 * 60 * 24 * 7,
+          quantity: 1,
+          buyoutPricePerToken: price.value,
+          startTimestamp: new Date(),
+          reservePricePerToken: 0,
+        },
+        {
+          onSuccess(data, variables, context) {
+            console.log("SUCCESS", data, variables, context);
+            router.push("/");
+          },
+          onError(error, variables, context) {
+            console.log("ERROR", error, variables, context);
+            router.push("/");
+          },
+        }
+      );
     }
   };
   const ownedNfts = useOwnedNFTs(collectionContract, address);
